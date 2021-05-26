@@ -26,7 +26,7 @@ while True:
         readdata = eeprom.read(address)[0]
         verified = writedata == readdata
 
-        output = f"{time.time()} 1 {address:#05x} {writedata:#04x} {verified}"
+        output = f"{time.time()} 1 {address} {writedata} {verified}"
     except Exception as e:
         output = f"{time.time()} 0 {e}"
     print(output)
