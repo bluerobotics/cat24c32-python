@@ -19,7 +19,7 @@ if args.output:
     outfile = open(args.output, "w")
 
 while True:
-    address = randint(0, 0xf00)
+    address = randint(0, 0xffe) # the last byte is reserved as a serial ID, so we don't want to touch it
     writedata = randint(0, 0xff)
     try:
         eeprom.write(address, [writedata])
