@@ -1,0 +1,28 @@
+{
+  "0": {
+    "llType": "error",
+    "columns": [
+      {
+        "llabel": "error message",
+        "dtype": "str"
+      }
+    ]
+  },
+  "1": {
+    "llType": "data",
+    "columns": [
+      {
+        "llabel": "address",
+        "dtype": "int"
+      },
+      {
+        "llabel": "data",
+        "dtype": "int"
+      },
+      {
+        "llabel": "verified",
+        "dtype": "bool"
+      }
+    ]
+  }
+}
