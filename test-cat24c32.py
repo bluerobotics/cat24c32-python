@@ -3,44 +3,34 @@
 import argparse
 from cat24c32 import CAT24C32
 from random import randint
-import signal
+from pathlib import Path
+import llog
 import time
 
-parser = argparse.ArgumentParser(description='cat24c32 test')
+device = "cat24c32"
+defaultMeta = Path(__file__).resolve().parent / f"{device}.meta"
+
+parser = argparse.ArgumentParser(description=f'{device} test')
 parser.add_argument('--output', action='store', type=str, default=None)
+parser.add_argument('--meta', action='store', type=str, default=defaultMeta)
 parser.add_argument('--frequency', action='store', type=int, default=1)
 args = parser.parse_args()
 
-eeprom = CAT24C32()
 
-outfile = None
+with llog.LLogWriter(args.meta, args.output) as log:
+    eeprom = CAT24C32()
 
-if args.output:
-    outfile = open(args.output, "w")
+    while True:
+        address = randint(0, 0xffe) # the last byte is reserved as a serial ID, so we don't want to touch it
+        writedata = randint(0, 0xff)
+        try:
+            eeprom.write(address, [writedata])
+            readdata = eeprom.read(address)[0]
+            verified = writedata == readdata
 
-def cleanup(_signo, _stack):
-    if outfile:
-        outfile.close()
-    exit(0)
+            log.log(llog.LLOG_DATA, f"{address} {writedata} {verified}")
+        except Exception as e:
+            log.log(llog.LLOG_ERROR, e)
 
-signal.signal(signal.SIGTERM, cleanup)
-signal.signal(signal.SIGINT, cleanup)
-
-while True:
-    address = randint(0, 0xffe) # the last byte is reserved as a serial ID, so we don't want to touch it
-    writedata = randint(0, 0xff)
-    try:
-        eeprom.write(address, [writedata])
-        readdata = eeprom.read(address)[0]
-        verified = writedata == readdata
-
-        output = f"{time.time()} 1 {address} {writedata} {verified}"
-    except Exception as e:
-        output = f"{time.time()} 0 {e}"
-    print(output)
-    if outfile:
-        outfile.write(output)
-        outfile.write('\n')
-
-    if args.frequency:
-        time.sleep(1.0/args.frequency)
+        if args.frequency:
+            time.sleep(1.0/args.frequency)
