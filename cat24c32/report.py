@@ -1,37 +1,46 @@
 #!/usr/bin/python3
 
 import matplotlib.pyplot as plt
+import pandas as pd
 
-log = None
+def generate_figures(log):
+    footer = f'ms5837 test report'
+
+    f, spec = log.figure(height_ratios=[1,1], suptitle=f'ms5837 data', footer=footer)
+
+    plt.subplot(spec[1,:])
+
+    # todo check if log.error exists
+    try:
+        log.error.ttable(rl=True)
+    except:
+        pass
+
+    plt.subplot(spec[1,:])
+    counts = log.data.address.value_counts()
+
+    map = pd.DataFrame(dict(c=counts, x=counts.index.values & 0b111111, y=counts.index.values >> 6))
+    plt.scatter(map.x, map.y, s=20*map.c/map.c.max())
+
 
 def main():
-    import argparse
     from llog import LLogReader
     from matplotlib.backends.backend_pdf import PdfPages
-    import os
+    from pathlib import Path
 
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-
-    defaultMeta = dir_path + '/cat24c32.meta'
-    parser = argparse.ArgumentParser(description='cat24c32 test report')
-    parser.add_argument('--input', action='store', type=str, required=True)
-    parser.add_argument('--meta', action='store', type=str, default=defaultMeta)
-    parser.add_argument('--output', action='store', type=str)
-    parser.add_argument('--show', action='store_true')
+    parser = LLogReader.create_default_parser(__file__, 'cat24c32')
     args = parser.parse_args()
 
     log = LLogReader(args.input, args.meta)
 
-    counts = log.data.address.value_counts()
+    generate_figures(log)
 
-    import pandas as pd
-    map = pd.DataFrame(dict(c=counts, x=counts.index.values & 0b111111, y=counts.index.values >> 6))
-    plt.scatter(map.x, map.y, s=20*map.c/map.c.max())
-    plt.show()
     if args.output:
-        # todo check if it exists!
-        with PdfPages(args.output) as pdf:
-            [pdf.savefig(n) for n in plt.get_fignums()]
+        if Path(args.output).exists():
+            print(f'WARN {args.output} exists! skipping ..')
+        else:
+            with PdfPages(args.output) as pdf:
+                [pdf.savefig(n) for n in plt.get_fignums()]
 
     if args.show:
         plt.show()
