@@ -8,11 +8,11 @@ def generate_figures(log):
 
     f, spec = log.figure(height_ratios=[1,1], suptitle=f'ms5837 data', footer=footer)
 
-    plt.subplot(spec[1,:])
+    plt.subplot(spec[0,:])
 
     # todo check if log.error exists
     try:
-        log.error.ttable(rl=True)
+        log.error.head(10).ttable(rl=True)
     except:
         pass
 
