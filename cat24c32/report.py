@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 def generate_figures(log):
-    footer = f'ms5837 test report'
+    footer = f'cat24c32 test report'
 
-    f, spec = log.figure(height_ratios=[1,1], suptitle=f'ms5837 data', footer=footer)
+    f, spec = log.figure(height_ratios=[1,1], suptitle=f'cat24c32 data', footer=footer)
 
     plt.subplot(spec[0,:])
 
