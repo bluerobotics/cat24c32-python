@@ -9,6 +9,9 @@ def generate_figures(log):
     f, spec = log.figure(height_ratios=[1,1], suptitle=f'cat24c32 data', footer=footer)
 
     plt.subplot(spec[0,:])
+    counts = log.data.address.value_counts()
+
+    plt.subplot(spec[1,:])
 
     # todo check if log.error exists
     try:
@@ -16,11 +19,8 @@ def generate_figures(log):
     except:
         pass
 
-    plt.subplot(spec[1,:])
-    counts = log.data.address.value_counts()
-
     map = pd.DataFrame(dict(c=counts, x=counts.index.values & 0b111111, y=counts.index.values >> 6))
-    plt.scatter(map.x, map.y, s=20*map.c/map.c.max())
+    plt.scatter(map.x, map.y, s=(20*map.c/map.c.max()).astype(float))
 
 
 def main():
