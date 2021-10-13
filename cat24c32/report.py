@@ -10,17 +10,15 @@ def generate_figures(log):
 
     plt.subplot(spec[0,:])
     counts = log.data.address.value_counts()
+    map = pd.DataFrame(dict(c=counts, x=counts.index.values & 0b111111, y=counts.index.values >> 6))
+    plt.scatter(map.x, map.y, s=(20*map.c/map.c.max()).astype(float))
 
     plt.subplot(spec[1,:])
-
     # todo check if log.error exists
     try:
         log.error.head(10).ttable(rl=True)
     except:
         pass
-
-    map = pd.DataFrame(dict(c=counts, x=counts.index.values & 0b111111, y=counts.index.values >> 6))
-    plt.scatter(map.x, map.y, s=(20*map.c/map.c.max()).astype(float))
 
 
 def main():
